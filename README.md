@@ -1,2 +1,2 @@
-# CPSC-463-Project
+# Inventory Tracker
  

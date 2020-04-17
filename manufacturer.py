@@ -55,23 +55,19 @@ class manufacturerStack(QWidget):
         self.leftlist.insertItem(0, 'Add Stock')
         self.leftlist.insertItem(1, 'Manage Stock')
         self.leftlist.insertItem(2, 'View Stock')
-        self.leftlist.insertItem(3, 'View Transaction History')
 
         self.stack1 = QWidget()
         self.stack2 = QWidget()
         self.stack3 = QWidget()
-        self.stack4 = QWidget()
 
         self.stack1UI()
         self.stack2UI()
         self.stack3UI()
-        self.stack4UI()
 
         self.Stack = QStackedWidget(self)
         self.Stack.addWidget(self.stack1)
         self.Stack.addWidget(self.stack2)
         self.Stack.addWidget(self.stack3)
-        self.Stack.addWidget(self.stack4)
 
         hbox = QHBoxLayout(self)
         hbox.addWidget(self.leftlist)
@@ -112,13 +108,10 @@ class manufacturerStack(QWidget):
         self.stack1.setLayout(layout)
 
     def on_click(self): # Add user input data to the database when ADD STOCK button is pressed
-        now = datetime.datetime.now()
         stock_name_inp = self.stock_name.text().replace(' ','_').lower()
         stock_count_inp = int(self.stock_count.text())
         stock_cost_inp = int(self.stock_cost.text())
-        #print(stock_name_inp,stock_count_inp,stock_cost_inp)
-        stock_add_date_time = now.strftime("%Y-%m-%d %H:%M")
-        d = mp.insert_prod(stock_name_inp,stock_count_inp,stock_cost_inp,stock_add_date_time)
+        d = mp.insert_prod(stock_name_inp,stock_count_inp,stock_cost_inp)
         print(d)
 
     def stack2UI(self): # MANAGE STOCK UI with 3 tab options
@@ -198,40 +191,31 @@ class manufacturerStack(QWidget):
         # deletes the stock item that is passed
         # needs a check test to see if item is in database
         # needs user notification if item was deleted successfully or item not found
-        now = datetime.datetime.now()
-        stock_del_date_time = now.strftime("%Y-%m-%d %H:%M")
         stock_name = self.stock_name_del.text().replace(' ','_').lower()
-        mp.remove_stock(stock_name,stock_del_date_time)
+        mp.remove_stock(stock_name)
 
     def call_red(self):
         # reduces the stock item quantity it is passed
         # needs a check test to see if item is in database
-        # needs user notification if item was deleted successfully or item not found
-        now = datetime.datetime.now()
-        stock_red_date_time = now.strftime("%Y-%m-%d %H:%M")
+        # needs user notification if item quantity was reduced successfully or item not found
         stock_name = self.stock_name_red.text().replace(' ','_').lower()
         try:
             stock_val = -(int(self.stock_count_red.text()))
-            print(stock_val)
-            print(type(stock_val))
-            mp.update_quantity(stock_name, stock_val, stock_red_date_time)
+            mp.update_quantity(stock_name, stock_val)
         except Exception:
             print('Exception')
 
 
     def call_add(self):
-        # adds the stock item that it is passed
-        now = datetime.datetime.now()
-        stock_call_add_date_time = now.strftime("%Y-%m-%d %H:%M")
+        # adds the stock item quantity that it is passed
+        # needs a check test to see if item is in database
+        # needs user notification if item quantity was increased successfully or item not found
         stock_name = self.stock_name_add.text().replace(' ','_').lower()
         stock_val = int(self.stock_count_add.text())
-        mp.update_quantity(stock_name, stock_val, stock_call_add_date_time)
+        mp.update_quantity(stock_name, stock_val)
 
 
     def stack3UI(self): # VIEW STOCK TAB
-        table = mp.show_stock()
-        print('show')
-        print(table)
         layout = QVBoxLayout()
         self.srb = QPushButton()
         self.srb.setText("Get Search Result.")
@@ -288,95 +272,6 @@ class manufacturerStack(QWidget):
             self.lbl3.setText('Viewing Stock Database.')
         else:
             self.lbl3.setText('No valid information in database.')
-
-    def stack4UI(self): # VIEW TRANSACTION HISTORY TAB
-        layout = QVBoxLayout()
-        self.srt = QPushButton()
-        self.srt.setText("Get Transaction History.")
-        self.Trans = QTableWidget()
-        self.lbl4 = QLabel()
-        self.lbl_trans_text = QLabel()
-        self.lbl_trans_text.setText("Enter the search keyword:")
-        self.trans_text = QLineEdit()
-
-        self.Trans.setColumnCount(6)
-        self.Trans.setColumnWidth(0, 150)
-        self.Trans.setColumnWidth(1, 150)
-        self.Trans.setColumnWidth(2, 150)
-        self.Trans.setColumnWidth(3, 100)
-        self.Trans.setColumnWidth(4, 100)
-        self.Trans.setColumnWidth(5, 500)
-        self.Trans.insertRow(0)
-        self.Trans.setItem(0, 0, QTableWidgetItem('Transaction ID'))
-        self.Trans.setItem(0, 1, QTableWidgetItem('Stock Name'))
-        self.Trans.setItem(0, 2, QTableWidgetItem('Transaction Type'))
-        self.Trans.setItem(0, 3, QTableWidgetItem('Date'))
-        self.Trans.setItem(0, 4, QTableWidgetItem('Time'))
-        self.Trans.setItem(0, 5, QTableWidgetItem('Transaction Specific'))
-        self.Trans.setRowHeight(0, 50)
-
-        layout.addWidget(self.Trans)
-        layout.addWidget(self.lbl_trans_text)
-        layout.addWidget(self.trans_text)
-        layout.addWidget(self.srt)
-        layout.addWidget(self.lbl4)
-        self.srt.clicked.connect(self.show_trans_history)
-        self.stack4.setLayout(layout)
-
-    def show_trans_history(self):
-        if self.Trans.rowCount()>1:
-            for i in range(1,self.Trans.rowCount()):
-                self.Trans.removeRow(1)
-
-        path = os.path.join(os.path.dirname(os.path.realpath(__file__)),'transaction.txt')
-        if os.path.exists(path):
-            tsearch = open(path, 'r')
-            x_c = tsearch.readlines()
-            tsearch.close()
-            x = []
-            if self.trans_text.text() != '':
-                key = self.trans_text.text()
-                for i in range(0,len(x_c)):
-                    a = x_c[i].split(" ")
-                    name = a[0]
-                    action = a[-2]
-                    if (key.lower() in name.lower()) or (key.lower() in action.lower()) :
-                        x.append(a)
-            else:
-                x = x_c.copy()
-
-            for i in range(0,len(x)):
-                x.sort(key=lambda a: a[4])
-            #print(x)
-            tid = 1900001
-            for i in range(1,len(x)+1):
-                self.Trans.insertRow(i)
-
-                a = x[i-1].split(" ")
-                if a[-2] == 'UPDATE':
-                    p = 'Quantity of Stock Changed from '+a[1]+' to '+a[2]
-                elif a[-2] == 'INSERT':
-                    p = 'Stock added with Quantity: '+a[1]+' and Cost: '+a[2]
-                elif a[-2] == 'REMOVE':
-                    p = 'Stock information deleted.'
-                else:
-                    p = 'None'
-
-
-                self.Trans.setItem(i, 0, QTableWidgetItem(str(tid)))
-                self.Trans.setItem(i, 1, QTableWidgetItem(a[0].replace('_',' ')))
-                self.Trans.setItem(i, 2, QTableWidgetItem(a[-2]))
-                self.Trans.setItem(i, 3, QTableWidgetItem(a[3]))
-                self.Trans.setItem(i, 4, QTableWidgetItem(a[4]))
-                self.Trans.setItem(i, 5, QTableWidgetItem(p))
-                self.Trans.setRowHeight(i, 50)
-                tid += 1
-
-            self.lbl4.setText('Transaction History.')
-        else:
-            self.lbl4.setText('No valid information found.')
-
-
 
     def display(self, i):
         self.Stack.setCurrentIndex(i)

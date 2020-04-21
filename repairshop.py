@@ -82,7 +82,7 @@ class repairshopStack(QWidget):
 
     def stack1UI(self): # ADD STOCK UI
         layout = QFormLayout()
-
+        self.mes = QLabel()
 
         self.ok = QPushButton('Order Stock', self)
         clear = QPushButton('Clear', self)
@@ -95,6 +95,7 @@ class repairshopStack(QWidget):
 
         layout.addWidget(self.ok)
         layout.addWidget(clear)
+        layout.addWidget(self.mes)
 
         self.ok.clicked.connect(self.on_click)
 
@@ -107,12 +108,17 @@ class repairshopStack(QWidget):
         # remove quantity from Manufacturer stock
         stock_name_dec = self.stock_name.text().replace(' ','_').lower()
         stock_count_dec = -(int(self.stock_count.text()))
-        mp.del_shop_stock(stock_name_dec,stock_count_dec)
 
         # add quantity to Shop stock
         stock_name_inc = self.stock_name.text().replace(' ','_').lower()
         stock_count_inc = (int(self.stock_count.text()))
-        mp.add_shop_stock(stock_name_inc,stock_count_inc)
+
+        if (stock_count_dec and stock_count_inc > 0):
+            mp.del_shop_stock(stock_name_dec,stock_count_dec)
+            message = mp.add_shop_stock(stock_name_inc,stock_count_inc)
+            self.mes.setText(message)
+        else:
+            self.mes.setText('Invalid quantity')
 
 
     def stack3UI(self): # VIEW SHOP STOCK TAB
@@ -208,7 +214,7 @@ class repairshopStack(QWidget):
                 self.View5.removeRow(1)
 
 
-        x_act = mp.show_stock()
+        x_act = mp.show_manu_order_stock()
         x = []
         if self.conf_text5.text() != '':
             for i in range(0,len(x_act)):
@@ -216,7 +222,7 @@ class repairshopStack(QWidget):
                 if self.conf_text5.text().lower() in a[0].lower():
                     x.append(a)
         else:
-            x = mp.show_stock()
+            x = mp.show_manu_order_stock()
 
         if len(x)!=0:
             for i in range(1,len(x)+1):

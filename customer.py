@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtCore import QDate
 from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QCalendarWidget
 from PyQt5.QtWidgets import QFormLayout
 from PyQt5 import QtCore
@@ -78,7 +79,7 @@ class customerStack(QWidget):
 
     def stack1UI(self): # ADD STOCK UI
         layout = QFormLayout()
-
+        self.mes = QLabel()
 
         self.ok = QPushButton('Purchase Car', self)
         clear = QPushButton('Clear', self)
@@ -91,6 +92,7 @@ class customerStack(QWidget):
 
         layout.addWidget(self.ok)
         layout.addWidget(clear)
+        layout.addWidget(self.mes)
 
         self.ok.clicked.connect(self.on_click)
 
@@ -103,12 +105,17 @@ class customerStack(QWidget):
         # remove quantity from Manufacturer stock
         stock_name_dec = self.stock_name.text().replace(' ','_').lower()
         stock_count_dec = -(int(self.stock_count.text()))
-        mp.del_car_stock(stock_name_dec,stock_count_dec)
 
         # add quantity to Dealership stock
         stock_name_inc = self.stock_name.text().replace(' ','_').lower()
         stock_count_inc = (int(self.stock_count.text()))
-        mp.add_car_stock(stock_name_inc,stock_count_inc)
+
+        if (stock_count_dec and stock_count_inc > 0):
+            mp.del_car_stock(stock_name_dec,stock_count_dec)
+            message = mp.add_car_stock(stock_name_inc,stock_count_inc)
+            self.mes.setText(message)
+        else:
+            self.mes.setText('Invalid quantity')
 
 
     def stack3UI(self): # VIEW MANUFACTURER STOCK UI

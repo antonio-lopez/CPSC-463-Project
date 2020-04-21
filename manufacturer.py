@@ -82,7 +82,7 @@ class manufacturerStack(QWidget):
 
     def stack1UI(self): # ADD STOCK UI
         layout = QFormLayout()
-
+        self.add_mes = QLabel()
 
         self.ok = QPushButton('Add Stock', self)
         clear = QPushButton('Clear', self)
@@ -98,6 +98,7 @@ class manufacturerStack(QWidget):
 
         layout.addWidget(self.ok)
         layout.addWidget(clear)
+        layout.addWidget(self.add_mes)
 
         self.ok.clicked.connect(self.on_click)
 
@@ -111,8 +112,12 @@ class manufacturerStack(QWidget):
         stock_name_inp = self.stock_name.text().replace(' ','_').lower()
         stock_count_inp = int(self.stock_count.text())
         stock_cost_inp = int(self.stock_cost.text())
-        d = mp.insert_prod(stock_name_inp,stock_count_inp,stock_cost_inp)
-        print(d)
+
+        if (stock_count_inp and stock_cost_inp > 0):
+            message = mp.insert_prod(stock_name_inp,stock_count_inp,stock_cost_inp)
+            self.add_mes.setText(message)
+        else:
+            self.add_mes.setText('Invalid input')
 
     def stack2UI(self): # MANAGE STOCK UI with 3 tab options
 
@@ -136,6 +141,8 @@ class manufacturerStack(QWidget):
 
     def tab1UI(self):   #ADD QUANTITY TAB
         layout = QFormLayout()
+        self.mes1 = QLabel()
+
         self.ok_add = QPushButton('Add Stock', self)
         clear = QPushButton('Clear', self)
 
@@ -147,6 +154,7 @@ class manufacturerStack(QWidget):
 
         layout.addWidget(self.ok_add)
         layout.addWidget(clear)
+        layout.addWidget(self.mes1)
         self.tab1.setLayout(layout)
 
         self.ok_add.clicked.connect(self.call_add)
@@ -155,6 +163,8 @@ class manufacturerStack(QWidget):
 
     def tab2UI(self):   # REDUCE QUANTITY TAB
         layout = QFormLayout()
+        self.mes2 = QLabel()
+
         self.ok_red = QPushButton('Reduce Stock', self)
         clear = QPushButton('Clear', self)
 
@@ -167,6 +177,7 @@ class manufacturerStack(QWidget):
 
         layout.addWidget(self.ok_red)
         layout.addWidget(clear)
+        layout.addWidget(self.mes2)
         self.tab2.setLayout(layout)
 
         self.ok_red.clicked.connect(self.call_red)
@@ -175,6 +186,8 @@ class manufacturerStack(QWidget):
 
     def tab3UI(self):   # DELETE STOCK TAB
         layout = QFormLayout()
+        self.mes3 = QLabel()
+
         self.ok_del = QPushButton('Delete Stock', self)
         clear = QPushButton('Clear', self)
 
@@ -182,6 +195,7 @@ class manufacturerStack(QWidget):
         layout.addRow("Stock Name", self.stock_name_del)
         layout.addWidget(self.ok_del)
         layout.addWidget(clear)
+        layout.addWidget(self.mes3)
         self.tab3.setLayout(layout)
 
         self.ok_del.clicked.connect(self.call_del)
@@ -192,18 +206,21 @@ class manufacturerStack(QWidget):
         # needs a check test to see if item is in database
         # needs user notification if item was deleted successfully or item not found
         stock_name = self.stock_name_del.text().replace(' ','_').lower()
-        mp.remove_stock(stock_name)
+        message = mp.remove_stock(stock_name)
+        self.mes3.setText(message)
 
     def call_red(self):
         # reduces the stock item quantity it is passed
         # needs a check test to see if item is in database
         # needs user notification if item quantity was reduced successfully or item not found
         stock_name = self.stock_name_red.text().replace(' ','_').lower()
-        try:
-            stock_val = -(int(self.stock_count_red.text()))
-            mp.update_quantity(stock_name, stock_val)
-        except Exception:
-            print('Exception')
+        stock_val = int(self.stock_count_red.text())
+
+        if (stock_val > 0):
+            message = mp.dec_manu_quantity(stock_name, stock_val)
+            self.mes2.setText(message)
+        else:
+            self.mes2.setText('Invalid quantity')
 
 
     def call_add(self):
@@ -212,7 +229,12 @@ class manufacturerStack(QWidget):
         # needs user notification if item quantity was increased successfully or item not found
         stock_name = self.stock_name_add.text().replace(' ','_').lower()
         stock_val = int(self.stock_count_add.text())
-        mp.update_quantity(stock_name, stock_val)
+
+        if (stock_val > 0):
+            message = mp.inc_manu_quantity(stock_name, stock_val)
+            self.mes1.setText(message)
+        else:
+            self.mes1.setText('Invalid quantity')
 
 
     def stack3UI(self): # VIEW STOCK TAB

@@ -20,14 +20,14 @@ Download and install Python 3.7.4
  
 Install PyQt5
 
-For Windows: 
+### For Windows: 
 
 * Open a command prompt and run command:
 
 *	`pip install pyqt5-tools`
 
 
-For Linux:
+### For Linux:
 
 * Open a terminal and run command:
 
@@ -38,16 +38,20 @@ Clone the repository
 
 Change to CPSC-463-Project directory
 
-For Windows:
+### For Windows:
+
 Open command prompt in current directory
 
 *	Type `cmd` in the Windows Explorer search bar and press Enter
 
-For Linux:
+
+### For Linux:
 
 Right click anywhere within the directory window
 
 Select `Open in Terminal`
+
+
 
 Open main file
 

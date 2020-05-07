@@ -43,7 +43,8 @@ Change to CPSC-463-Project directory
 Open command prompt in current directory
 
 *	Type `cmd` in the Windows Explorer search bar and press Enter
-
+* Go to directory containing the project
+* Once in the directory run 'python manager.py' 
 
 ### For Linux:
 
